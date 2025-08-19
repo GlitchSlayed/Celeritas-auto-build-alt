@@ -99,9 +99,20 @@ jobs:
       - name: Fix Gradle permission
         run: chmod +x ./celeritas/gradlew
 
+      - name: Set up Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('celeritas/**/*.gradle*', 'celeritas/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      
+
       - name: Build Jars
         working-directory: ./celeritas
-        run: ./gradlew packageJar
+        run: ./gradlew -Ptarget_versions=">1.7.10" packageJar
 
       - name: Update hash storage
         run: echo $COMMIT_HASH > ./latest_commit
